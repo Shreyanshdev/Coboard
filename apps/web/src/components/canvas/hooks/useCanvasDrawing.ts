@@ -550,6 +550,12 @@ export function useCanvasDrawing({
 
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 2) {
+        // Cancel active single-finger stroke if 2nd finger touches for pinch-zoom
+        isDrawingRef.current = false;
+        currentElementRef.current = null;
+        setCurrentElement(null);
+        requestDraw();
+
         e.preventDefault();
         const t1 = e.touches[0];
         const t2 = e.touches[1];
@@ -609,9 +615,9 @@ export function useCanvasDrawing({
       canvas.removeEventListener("touchmove", handleTouchMove);
       canvas.removeEventListener("touchend", handleTouchEnd);
     };
-  }, [canvasRef, zoom, panOffset, setZoom, setPanOffset]);
+  }, [canvasRef, zoom, panOffset, setZoom, setPanOffset, requestDraw]);
 
-  const getCanvasPoint = (e: React.MouseEvent<HTMLCanvasElement>): Point => {
+  const getCanvasPoint = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>): Point => {
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return { x: 0, y: 0 };
     return {
@@ -620,9 +626,16 @@ export function useCanvasDrawing({
     };
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseDown = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     if (inlineText) commitInlineText();
     const clickPoint = getCanvasPoint(e);
+
+    // Acquire pointer capture on touch / pen so fast drawing doesn't get interrupted
+    if ("pointerId" in e && e.target && "setPointerCapture" in e.target) {
+      try {
+        (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
+      } catch (_) {}
+    }
 
     // Panning
     if (e.button === 1 || isSpacePressed || activeTool === "hand") {
@@ -741,7 +754,7 @@ export function useCanvasDrawing({
     requestDraw();
   };
 
-  const handleDoubleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleDoubleClick = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     const clickPoint = getCanvasPoint(e);
     const clickedEl = [...elementsRef.current].reverse().find((el) => isPointInsideElement(clickPoint, el));
 
@@ -767,7 +780,7 @@ export function useCanvasDrawing({
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseMove = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     if (isPanning) {
       setPanOffset({
         x: e.clientX / zoom - startPanPoint.x,
@@ -963,7 +976,13 @@ export function useCanvasDrawing({
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e?: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
+    if (e && "pointerId" in e && e.target && "releasePointerCapture" in e.target) {
+      try {
+        (e.target as HTMLCanvasElement).releasePointerCapture(e.pointerId);
+      } catch (_) {}
+    }
+
     if (activeTool === "laser" || isDrawingLaserRef.current) {
       isDrawingLaserRef.current = false;
       return;

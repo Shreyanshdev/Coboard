@@ -746,7 +746,7 @@ export const InteractiveCanvasDemo: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, [redraw]);
 
-  const getCanvasCoordinates = (e: React.MouseEvent<HTMLCanvasElement>): Point => {
+  const getCanvasCoordinates = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>): Point => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
@@ -793,9 +793,15 @@ export const InteractiveCanvasDemo: React.FC = () => {
     setInlineText(null);
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseDown = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     if (inlineText) commitInlineText();
     const { x, y } = getCanvasCoordinates(e);
+
+    if ("pointerId" in e && e.target && "setPointerCapture" in e.target) {
+      try {
+        (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId);
+      } catch (_) {}
+    }
 
     if (selectedTool === "eraser") {
       setIsErasing(true);
@@ -852,7 +858,7 @@ export const InteractiveCanvasDemo: React.FC = () => {
     setCurrentElement(newEl);
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleMouseMove = (e: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     const currentPoint = getCanvasCoordinates(e);
 
     if (selectedTool === "eraser") {
@@ -920,7 +926,13 @@ export const InteractiveCanvasDemo: React.FC = () => {
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e?: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
+    if (e && "pointerId" in e && e.target && "releasePointerCapture" in e.target) {
+      try {
+        (e.target as HTMLCanvasElement).releasePointerCapture(e.pointerId);
+      } catch (_) {}
+    }
+
     if (selectedTool === "eraser" || isErasing) {
       if (erasedIds.size > 0) {
         triggerEraseElements(Array.from(erasedIds));
@@ -944,7 +956,7 @@ export const InteractiveCanvasDemo: React.FC = () => {
     }
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = (e?: React.PointerEvent<HTMLCanvasElement> | React.MouseEvent<HTMLCanvasElement>) => {
     setEraserCursorPos(null);
     if (isErasing) {
       if (erasedIds.size > 0) {
@@ -956,7 +968,7 @@ export const InteractiveCanvasDemo: React.FC = () => {
     }
     if (isDraggingSelected) setIsDraggingSelected(false);
     if (isDrawing && currentElement) {
-      handleMouseUp();
+      handleMouseUp(e);
     }
   };
 
@@ -1107,11 +1119,12 @@ export const InteractiveCanvasDemo: React.FC = () => {
       <div className="relative w-full h-[380px] sm:h-[430px] bg-[#f8f6f2] cursor-crosshair overflow-hidden select-none">
         <canvas
           ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-          className="w-full h-full block"
+          onPointerDown={handleMouseDown}
+          onPointerMove={handleMouseMove}
+          onPointerUp={handleMouseUp}
+          onPointerCancel={handleMouseLeave}
+          onPointerLeave={handleMouseLeave}
+          className="w-full h-full block touch-none select-none"
         />
 
         {/* Inline Text Editor */}

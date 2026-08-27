@@ -1052,11 +1052,13 @@ export const Whiteboard: React.FC<WhiteboardProps> = ({
       <div className="w-full h-full relative" style={{ cursor: getCursorStyle() }}>
         <canvas
           ref={canvasRef}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
+          onPointerDown={handleMouseDown}
+          onPointerMove={handleMouseMove}
+          onPointerUp={handleMouseUp}
+          onPointerCancel={handleMouseUp}
+          onPointerLeave={handleMouseUp}
           onDoubleClick={handleDoubleClick}
-          className="absolute inset-0 block touch-none"
+          className="absolute inset-0 block touch-none select-none"
         />
 
         {/* INLINE TEXT EDITOR OVERLAY */}
