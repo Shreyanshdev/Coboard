@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { HeroSection } from "@/components/hero/HeroSection";
+import { FeaturesGrid } from "@/components/features/FeaturesGrid";
 import { ToolsShowcase } from "@/components/features/ToolsShowcase";
 import { Footer } from "@/components/layout/Footer";
 import { AuthModal } from "@/components/auth/AuthModal";
@@ -34,6 +35,8 @@ export default function LandingPage() {
           onOpenAuth={() => setIsAuthOpen(true)}
           onOpenCreateRoom={() => setIsCreateRoomOpen(true)}
         />
+
+        <FeaturesGrid />
 
         <ToolsShowcase />
       </main>

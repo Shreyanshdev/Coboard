@@ -21,7 +21,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
   return (
     <section id="about" className="relative pt-28 sm:pt-36 pb-10 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex flex-col items-center">
       {/* Top Tagline & Handwritten Doodle Accents */}
-      <div className="relative text-center mb-8 max-w-2xl mx-auto">
+      <div className="relative text-center mb-8 max-w-2xl mx-auto select-none">
         {/* Handwritten floating note 1 (Terracotta Orange) */}
         <div className="absolute -top-6 -right-6 sm:-right-12 hidden sm:flex items-center gap-1 font-handwriting text-2xl text-[#c45a2c] -rotate-6 select-none pointer-events-none">
           <span>no auth needed!</span>
@@ -50,7 +50,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
             coboard whiteboard.
           </span>
         </h1>
-        <p className="text-xs sm:text-sm text-[#706155] mt-2.5 max-w-lg mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#706155] mt-2.5 max-w-lg mx-auto leading-relaxed font-normal">
           Open a canvas and start drawing immediately for personal notes. Share and collaborate seamlessly in real-time rooms.
         </p>
 
@@ -75,12 +75,16 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
         </div>
       </div>
 
-      {/* Compact Bento Grid (Whiteboard, Sync, Rough Engine) with Hand-drawn Curvy Annotations */}
+      {/* Seamless Fluid Room Launcher (Positioned ABOVE Bento Cards) */}
       <div className="relative z-10 w-full mb-10">
+        <RoomJoinCard onOpenCreateRoom={onOpenCreateRoom} />
+      </div>
+
+      {/* Compact Bento Grid with Clean Floating Constantly-Spinning Icons */}
+      <div className="relative z-10 w-full mb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-          {/* Card 1: Whiteboard -> Links directly to /canvas */}
+          {/* Card 1: Personal Canvas (Floating & Constantly Spinning Drafting Nib) */}
           <div className="relative flex flex-col">
-            {/* Top Curvy Annotation (Sky Blue) */}
             <div className="hidden md:flex items-center justify-center gap-1 font-handwriting text-lg text-[#0284c7] -rotate-2 select-none mb-1.5">
               <span>infinite drawing space</span>
               <svg className="w-5 h-5 text-[#0284c7]" viewBox="0 0 30 30" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -91,17 +95,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
 
             <Link
               href="/canvas"
-              className="group liquid-glass-card rounded-[32px] p-6 flex flex-col items-center justify-between text-center min-h-[240px] cursor-pointer relative overflow-hidden flex-1"
+              className="group liquid-glass-card rounded-[32px] p-6 flex flex-col items-center justify-between text-center min-h-[220px] cursor-pointer relative overflow-hidden flex-1 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
             >
-              {/* Dynamic Dot Matrix Hover Pattern */}
               <div className="card-dot-pattern" />
+              <div className="absolute -top-10 -left-10 w-32 h-32 bg-[#d96734]/12 rounded-full blur-2xl pointer-events-none" />
 
-              <div className="absolute -top-10 -left-10 w-32 h-32 bg-[#d96734]/15 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#d96734] via-[#bf5324] to-[#782e10] p-[2px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),0_4px_12px_rgba(180,70,30,0.25)] group-hover:scale-108 transition-transform duration-300 relative z-10">
-                <div className="w-full h-full rounded-full flex items-center justify-center bg-[#bf5324]/30 backdrop-blur-sm">
-                  <DraftingNibSvg className="w-7 h-7 drop-shadow-sm" />
-                </div>
+              {/* Clean Floating Icon with Constant Smooth Spin Animation */}
+              <div className="my-2 transition-transform duration-300 relative z-10 animate-[spin_14s_linear_infinite] hover:animate-[spin_4s_linear_infinite]">
+                <DraftingNibSvg className="w-11 h-11 drop-shadow-md" />
               </div>
 
               <div className="space-y-0.5 my-2 relative z-10">
@@ -119,9 +120,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
             </Link>
           </div>
 
-          {/* Card 2: Real-time Sync */}
+          {/* Card 2: Real-time Sync (Floating & Constantly Spinning Quantum Synapse) */}
           <div className="relative flex flex-col">
-            {/* Top Curvy Annotation (Warm Gold) */}
             <div className="hidden md:flex items-center justify-center gap-1 font-handwriting text-lg text-[#b45309] rotate-2 select-none mb-1.5">
               <span>sub-5ms WebSocket sync</span>
               <svg className="w-5 h-5 text-[#b45309]" viewBox="0 0 30 30" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -132,17 +132,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
 
             <div
               onClick={onOpenCreateRoom}
-              className="group liquid-glass-card rounded-[32px] p-6 flex flex-col items-center justify-between text-center min-h-[240px] cursor-pointer relative overflow-hidden flex-1"
+              className="group liquid-glass-card rounded-[32px] p-6 flex flex-col items-center justify-between text-center min-h-[220px] cursor-pointer relative overflow-hidden flex-1 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
             >
-              {/* Dynamic Dot Matrix Hover Pattern */}
               <div className="card-dot-pattern" />
+              <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#dfad42]/12 rounded-full blur-2xl pointer-events-none" />
 
-              <div className="absolute -top-10 -right-10 w-32 h-32 bg-[#dfad42]/15 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#dfad42] via-[#b88522] to-[#6b4908] p-[2px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.4),0_4px_12px_rgba(200,145,40,0.25)] group-hover:scale-108 transition-transform duration-300 relative z-10">
-                <div className="w-full h-full rounded-full flex items-center justify-center bg-[#b88522]/30 backdrop-blur-sm">
-                  <QuantumSyncSvg className="w-7 h-7 drop-shadow-sm" />
-                </div>
+              {/* Clean Floating Icon with Constant Smooth Spin Animation */}
+              <div className="my-2 transition-transform duration-300 relative z-10 animate-[spin_8s_linear_infinite] hover:animate-[spin_3s_linear_infinite]">
+                <QuantumSyncSvg className="w-11 h-11 drop-shadow-md" />
               </div>
 
               <div className="space-y-0.5 my-2 relative z-10">
@@ -160,9 +157,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
             </div>
           </div>
 
-          {/* Card 3: Rough Engine */}
+          {/* Card 3: Rough Engine (Floating & Constantly Spinning Geodesic Polyhedron) */}
           <div className="relative flex flex-col">
-            {/* Top Curvy Annotation (Emerald / Forest Green) */}
             <div className="hidden md:flex items-center justify-center gap-1 font-handwriting text-lg text-[#059669] -rotate-3 select-none mb-1.5">
               <span>organic sketchy strokes</span>
               <svg className="w-5 h-5 text-[#059669]" viewBox="0 0 30 30" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
@@ -173,17 +169,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
 
             <div
               onClick={onOpenCreateRoom}
-              className="group liquid-glass-card rounded-[32px] p-6 flex flex-col items-center justify-between text-center min-h-[240px] cursor-pointer relative overflow-hidden flex-1"
+              className="group liquid-glass-card rounded-[32px] p-6 flex flex-col items-center justify-between text-center min-h-[220px] cursor-pointer relative overflow-hidden flex-1 shadow-[0_8px_30px_rgba(0,0,0,0.03)]"
             >
-              {/* Dynamic Dot Matrix Hover Pattern */}
               <div className="card-dot-pattern" />
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#5293b0]/12 rounded-full blur-2xl pointer-events-none" />
 
-              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-[#5293b0]/15 rounded-full blur-2xl pointer-events-none" />
-
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#8ec4dc] via-[#5293b0] to-[#25576f] p-[2px] shadow-[inset_0_2px_4px_rgba(255,255,255,0.6),0_4px_12px_rgba(80,150,180,0.25)] group-hover:scale-108 transition-transform duration-300 relative z-10">
-                <div className="w-full h-full rounded-full flex items-center justify-center bg-[#5293b0]/30 backdrop-blur-sm">
-                  <RoughPolyhedronSvg className="w-7 h-7 drop-shadow-sm" />
-                </div>
+              {/* Clean Floating Icon with Constant Smooth Spin Animation */}
+              <div className="my-2 transition-transform duration-300 relative z-10 animate-[spin_10s_linear_infinite] hover:animate-[spin_3s_linear_infinite]">
+                <RoughPolyhedronSvg className="w-11 h-11 drop-shadow-md" />
               </div>
 
               <div className="space-y-0.5 my-2 relative z-10">
@@ -203,7 +196,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
         </div>
       </div>
 
-      {/* Embedded Live Interactive Whiteboard Sandbox with Curvy Arrows */}
+      {/* Embedded Live Interactive Whiteboard Sandbox */}
       <div id="demo" className="relative z-10 w-full space-y-3 pt-2 mb-10">
         <div className="flex flex-wrap items-center justify-between px-3 gap-2">
           {/* Violet / Purple Curvy Annotation (Left) */}
@@ -227,11 +220,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenAuth, onOpenCrea
         </div>
 
         <InteractiveCanvasDemo />
-      </div>
-
-      {/* Room Jump Form Card */}
-      <div className="relative z-10 w-full max-w-2xl mx-auto">
-        <RoomJoinCard onOpenCreateRoom={onOpenCreateRoom} />
       </div>
     </section>
   );
