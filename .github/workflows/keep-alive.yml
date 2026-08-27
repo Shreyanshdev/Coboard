@@ -1,0 +1,20 @@
+name: Render Free Tier Keep-Alive Bot
+
+on:
+  schedule:
+    # Trigger every 10 minutes
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+jobs:
+  ping-render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Backend Health Endpoint
+        run: |
+          if [ -n "${{ secrets.RENDER_BACKEND_URL }}" ]; then
+            echo "Pinging ${{ secrets.RENDER_BACKEND_URL }}/health..."
+            curl -s -f -m 15 "${{ secrets.RENDER_BACKEND_URL }}/health" || echo "Ping failed or starting up"
+          else
+            echo "RENDER_BACKEND_URL secret not set. Skipping GitHub Actions ping."
+          fi

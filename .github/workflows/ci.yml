@@ -1,0 +1,37 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-verify:
+    name: Typecheck & Build Monorepo
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🔨 Turborepo Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_HTTP_URL: http://localhost:3001
+          NEXT_PUBLIC_WS_URL: ws://localhost:8080
+          DATABASE_URL: mongodb://127.0.0.1:27017/excalidraw
+          JWT_SECRET: ci_pipeline_secret_key_test_only

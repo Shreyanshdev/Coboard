@@ -1,0 +1,21 @@
+{
+  "name": "excalidraw-monorepo",
+  "private": true,
+  "packageManager": "npm@11.17.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "start:http": "npm run start -w http-backend",
+    "start:ws": "npm run start -w ws-backend",
+    "start:web": "npm run start -w web"
+  },
+  "devDependencies": {
+    "turbo": "^2.10.12",
+    "typescript": "^7.0.2"
+  }
+}
