@@ -9,10 +9,8 @@
   },
   "dependencies": {
     "@repo/common": "*",
-    "mongoose": "^8.24.4"
-  },
-  "devDependencies": {
     "@types/node": "^22.0.0",
+    "mongoose": "^8.24.4",
     "typescript": "^5.7.0"
   }
 }
