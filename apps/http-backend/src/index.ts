@@ -1,10 +1,104 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+import https from "https";
+import http from "http";
 import { CreateUserSchema, SigninUserSchema, CreateRoomSchema, CanvasElement } from "@repo/common";
 import { connectDB, User, Room, mongoose } from "@repo/db";
-import { authMiddleware, AuthenticatedRequest, JWT_SECRET } from "./middleware";
 
+export const JWT_SECRET = process.env.JWT_SECRET || "coboard_super_secure_jwt_secret_key_change_me_in_prod";
+
+export interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
+
+export function authMiddleware(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+  const token = req.headers["authorization"] || req.headers["Authorization"];
+
+  if (!token || typeof token !== "string") {
+    res.status(403).json({ message: "Unauthorized - missing token" });
+    return;
+  }
+
+  try {
+    const bearerToken = token.startsWith("Bearer ") ? token.slice(7) : token;
+    const decoded = jwt.verify(bearerToken, JWT_SECRET) as { userId: string };
+    req.userId = decoded.userId;
+    next();
+  } catch {
+    res.status(403).json({ message: "Unauthorized - invalid token" });
+  }
+}
+
+/**
+ * Render Auto-Pinger Bot (Keep-Alive Service)
+ * Prevents Render.com free tier services from spinning down due to 15-minute inactivity.
+ */
+export function startKeepAliveBot(intervalMinutes: number = 10): NodeJS.Timeout | null {
+  const targetUrls: string[] = [];
+
+  if (process.env.RENDER_EXTERNAL_URL) {
+    targetUrls.push(process.env.RENDER_EXTERNAL_URL);
+  }
+  if (process.env.SERVER_URL) {
+    targetUrls.push(process.env.SERVER_URL);
+  }
+  if (process.env.KEEP_ALIVE_URLS) {
+    const splitUrls = process.env.KEEP_ALIVE_URLS.split(",").map((u) => u.trim());
+    targetUrls.push(...splitUrls);
+  }
+
+  const uniqueUrls = Array.from(new Set(targetUrls.filter(Boolean)));
+  if (uniqueUrls.length === 0) {
+    return null;
+  }
+
+  console.log(
+    `[Keep-Alive Bot] 🤖 Active! Pinging ${uniqueUrls.length} target(s) every ${intervalMinutes} minutes:`
+  );
+  uniqueUrls.forEach((u) => console.log(`  -> ${u}`));
+
+  const ping = (url: string) => {
+    try {
+      const fullUrl = url.endsWith("/health") ? url : `${url.replace(/\/$/, "")}/health`;
+      const client = fullUrl.startsWith("https") ? https : http;
+
+      const startTime = Date.now();
+      const req = client.get(fullUrl, (res) => {
+        const latency = Date.now() - startTime;
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 400) {
+          console.log(
+            `[Keep-Alive Bot] 🟢 Ping successful: ${fullUrl} [Status: ${res.statusCode}] (${latency}ms)`
+          );
+        }
+      });
+
+      req.on("error", (err) => {
+        console.warn(`[Keep-Alive Bot] ⚠️ Ping notice for ${fullUrl}:`, err.message);
+      });
+
+      req.setTimeout(10000, () => {
+        req.destroy();
+      });
+    } catch (e: any) {
+      console.warn(`[Keep-Alive Bot] Error creating request for ${url}:`, e.message);
+    }
+  };
+
+  // Initial ping after 30 seconds
+  setTimeout(() => {
+    uniqueUrls.forEach(ping);
+  }, 30 * 1000);
+
+  // Recurring interval
+  return setInterval(() => {
+    uniqueUrls.forEach(ping);
+  }, intervalMinutes * 60 * 1000);
+}
+
+// ============================================================================
+// EXPRESS APP INITIALIZATION
+// ============================================================================
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -46,7 +140,7 @@ app.post("/api/v1/signup", async (req, res) => {
 
       const newUser = await User.create({
         username: username.toLowerCase(),
-        password, // In prod, hash with bcrypt
+        password,
         name,
       });
 
@@ -241,11 +335,8 @@ app.post("/api/v1/room/:slug/elements", async (req, res) => {
   res.json({ message: "Elements saved successfully", count: memoryRooms[slug].elements.length });
 });
 
-import { startKeepAliveBot } from "./keep-alive";
-
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`HTTP Backend server running on http://localhost:${PORT}`);
-  // Start Render auto-ping keep-alive bot (runs every 10 mins)
+const PORT = parseInt(process.env.PORT || "3001");
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`[HTTP-Backend] 🚀 Server running on port ${PORT}`);
   startKeepAliveBot(10);
 });
