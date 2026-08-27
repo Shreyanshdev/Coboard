@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { WSMessage, CanvasElement } from "@repo/common";
 import { connectDB, Room, mongoose } from "@repo/db";
 
-const PORT = process.env.WS_PORT ? parseInt(process.env.WS_PORT) : 8080;
+const PORT = parseInt(process.env.PORT || process.env.WS_PORT || "8080");
 const JWT_SECRET = process.env.JWT_SECRET || "excalidraw_secret_key_123";
 
 // Connect to MongoDB
