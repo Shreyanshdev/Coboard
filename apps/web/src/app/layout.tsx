@@ -5,6 +5,14 @@ export const metadata: Metadata = {
   title: "Coboard | Virtual Collaborative Whiteboard",
   description:
     "An ultra-fast, virtual collaborative whiteboard with organic hand-drawn roughness, instant WebSocket synchronization, and zero friction.",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 };
 
 export default function RootLayout({
