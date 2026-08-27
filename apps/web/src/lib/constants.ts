@@ -2,7 +2,12 @@ import { ToolType } from "@repo/common";
 import { ToolConfig, DrawingOptions } from "@/types";
 
 export const HTTP_API_URL = process.env.NEXT_PUBLIC_HTTP_URL || "http://localhost:3001";
-export const WS_URL = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
+const rawWs = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8080";
+export const WS_URL = rawWs.startsWith("https://")
+  ? rawWs.replace("https://", "wss://")
+  : rawWs.startsWith("http://")
+  ? rawWs.replace("http://", "ws://")
+  : rawWs;
 
 export const SUPPORTED_TOOLS: ToolConfig[] = [
   { id: "select", label: "Select", iconName: "MousePointer", shortcut: "1", description: "Select, move and resize canvas items" },
